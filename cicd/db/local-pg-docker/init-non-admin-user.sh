@@ -1,0 +1,18 @@
+#!/bin/bash
+set -e
+
+if [ -z "$POSTGRES_NON_ADMIN_USER_LOGIN" ]; then
+    echo "Error : POSTGRES_NON_ADMIN_USER_LOGIN is not defined."
+    exit 1
+fi
+
+if [ -z "$POSTGRES_NON_ADMIN_USER_PASSWORD" ]; then
+    echo "Error : POSTGRES_NON_ADMIN_USER_PASSWORD is not defined."
+    exit 1
+fi
+
+
+psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL
+    CREATE USER ${POSTGRES_NON_ADMIN_USER_LOGIN} WITH PASSWORD '${POSTGRES_NON_ADMIN_USER_PASSWORD}';
+    GRANT CONNECT ON DATABASE ${POSTGRES_DB} TO ${POSTGRES_NON_ADMIN_USER_LOGIN};
+EOSQL

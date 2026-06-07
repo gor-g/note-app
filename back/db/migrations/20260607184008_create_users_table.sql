@@ -7,6 +7,11 @@ create table users (
     created_at timestamp not null default now()
 );
 
+
+GRANT SELECT, INSERT, UPDATE, DELETE
+ON TABLE users
+TO note_app_db_user;
+
 -- migrate:down
 
 drop table users;

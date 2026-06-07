@@ -9,6 +9,7 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 
+	"github.com/gor-g/note-app/back/internal/myhttp"
 	"github.com/gor-g/note-app/back/internal/users"
 )
 
@@ -36,11 +37,11 @@ func main() {
 	userHandler.RegisterRoutes(mux)
 
 	server := &http.Server{
-		Addr:    ":8080",
-		Handler: mux,
+		Addr:    ":8081",
+		Handler: myhttp.LoggingMiddleware(mux),
 	}
 
-	log.Println("server running on :8080")
+	log.Println("server running on :8081")
 
 	if err := server.ListenAndServe(); err != nil {
 		log.Fatal(err)
