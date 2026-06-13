@@ -26,7 +26,7 @@ func CORSMiddleware(allowedOrigin string, next http.Handler) http.Handler {
 		// Tell caches the response varies by Origin (important once more than
 		// one origin is allowed).
 		w.Header().Set("Vary", "Origin")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 
 		// Preflight request: answer it directly with 204 and don't run the

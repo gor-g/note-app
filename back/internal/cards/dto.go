@@ -2,21 +2,19 @@ package cards
 
 import "time"
 
-type CardDTO struct {
-    ID            string     `json:"id"`
-    UserID        string     `json:"userId"`
-    Question      string     `json:"question"`
-    Answer        string     `json:"answer"`
-    Priority      int        `json:"priority"`
-    EaseFactor    float64    `json:"easeFactor"`
-    IntervalDays  int        `json:"intervalDays"`
-    LastShownAt   *time.Time `json:"lastShownAt"`
-    NextReviewAt  *time.Time `json:"nextReviewAt"`
-    CreatedAt     time.Time  `json:"createdAt"`
+// CardBlob is the server's view of a card: an opaque, client-encrypted blob plus
+// the bookkeeping sync needs. The server never sees plaintext — Ciphertext is
+// the base64 AES-GCM blob produced in the browser (see the E2EE design in the
+// project README), and is null for a tombstone.
+type CardBlob struct {
+	ID         string    `json:"id"`
+	Ciphertext *string   `json:"ciphertext"` // null when Deleted
+	Deleted    bool      `json:"deleted"`
+	UpdatedAt  time.Time `json:"updatedAt"`
 }
 
-type CreateCardInput struct {
-    Question string `json:"question"`
-    Answer   string `json:"answer"`
-    Tags     []string `json:"tags"`
+// "Upsert" = update-or-insert. The client doesn't know or care whether this card already exists on the server; it just sends the id + blob, and the server inserts a new row or overwrites the existing one with the same id. One code path handles both.
+type UpsertCardInput struct {
+	ID         string `json:"id"`
+	Ciphertext string `json:"ciphertext"`
 }
