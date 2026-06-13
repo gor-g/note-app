@@ -36,9 +36,20 @@ func main() {
 
 	userHandler.RegisterRoutes(mux)
 
+	// Origin the browser frontend is served from. Required: rather than guess a
+	// default (which could silently allow the wrong origin in production), crash
+	// so misconfiguration is obvious. The run scripts export this.
+	frontendOrigin := os.Getenv("FRONTEND_ORIGIN")
+	if frontendOrigin == "" {
+		log.Fatal("FRONTEND_ORIGIN is not set")
+	}
+
+	// Middleware wraps outermost-first: CORS sees the request before logging.
+	handler := myhttp.CORSMiddleware(frontendOrigin, myhttp.LoggingMiddleware(mux))
+
 	server := &http.Server{
 		Addr:    ":8081",
-		Handler: myhttp.LoggingMiddleware(mux),
+		Handler: handler,
 	}
 
 	log.Println("server running on :8081")

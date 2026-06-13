@@ -1,0 +1,115 @@
+/* Centre whatever screen is showing within the full-height root container. */
+#root {
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+}
+
+/* The card that holds the auth form (and the placeholder home screen). */
+.auth-card {
+  width: 100%;
+  max-width: 380px;
+  padding: 32px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  background: var(--bg);
+  text-align: center;
+}
+
+.auth-card h1 {
+  font-size: 36px;
+  margin: 0 0 4px;
+}
+
+.auth-subtitle {
+  color: var(--text);
+  margin-bottom: 24px;
+}
+
+/* Login / Sign up tab switch. */
+.auth-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  margin-bottom: 24px;
+  background: var(--code-bg);
+  border-radius: 8px;
+}
+
+.auth-tabs button {
+  flex: 1;
+  padding: 8px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.auth-tabs button.active {
+  background: var(--bg);
+  color: var(--text-h);
+  box-shadow: var(--shadow);
+}
+
+/* The form itself: a simple vertical stack. */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  text-align: left;
+}
+
+.auth-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+  color: var(--text-h);
+}
+
+.auth-form input {
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text-h);
+  font: inherit;
+}
+
+.auth-form input:focus {
+  outline: none;
+  border-color: var(--accent-border);
+  box-shadow: 0 0 0 3px var(--accent-bg);
+}
+
+/* Primary submit button, reused on the placeholder home screen too. */
+.auth-form button[type='submit'],
+.auth-card > button {
+  padding: 11px;
+  border: none;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #fff;
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.auth-form button[type='submit']:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.auth-card > button {
+  margin-top: 20px;
+}
+
+/* Inline error message shown under the form on failure. */
+.auth-error {
+  color: #e5484d;
+  font-size: 14px;
+  margin: 0;
+}

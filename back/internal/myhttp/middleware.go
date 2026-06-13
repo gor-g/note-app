@@ -1,29 +1,23 @@
 package myhttp
 
 import (
-	"bytes"
-	"io"
 	"log"
 	"net/http"
+	"time"
 )
 
+// LoggingMiddleware logs one line per request.
+//
+// SECURITY: it deliberately does NOT log request bodies or headers. The body of
+// POST /users contains the user's plaintext password, and headers will soon
+// carry auth tokens/cookies — logging either would leak credentials into log
+// files (which are typically less protected than the database and often shipped
+// to third-party aggregators). Logging the password would also defeat the whole
+// point of bcrypt-hashing it before storage.
 func LoggingMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		body, err := io.ReadAll(r.Body)
-		if err != nil {
-			log.Printf("error reading body: %v", err)
-		}
-
-		log.Printf("=== Incoming Request ===")
-		log.Printf("Method: %s", r.Method)
-		log.Printf("URL: %s", r.URL.String())
-		log.Printf("Headers: %+v", r.Header)
-		log.Printf("Body: %s", string(body))
-		log.Printf("========================")
-
-		// Recréer le body pour que le handler puisse encore le lire
-		r.Body = io.NopCloser(bytes.NewBuffer(body))
-
+		start := time.Now()
 		next.ServeHTTP(w, r)
+		log.Printf("%s %s from %s (%s)", r.Method, r.URL.Path, r.RemoteAddr, time.Since(start))
 	})
 }
