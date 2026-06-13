@@ -10,6 +10,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	"github.com/gor-g/note-app/back/internal/myhttp"
+	"github.com/gor-g/note-app/back/internal/sessions"
 	"github.com/gor-g/note-app/back/internal/users"
 )
 
@@ -32,9 +33,19 @@ func main() {
 	userService := users.NewService(userRepo)
 	userHandler := users.NewHandler(userService)
 
+	// --- SESSIONS MODULE ---
+	// Session cookies are always Secure (HTTPS-only). Browsers
+	// (except Safari) treat localhost
+	// as a secure origin, so this works in dev too. Sessions last 7 days.
+	sessionTTL := 7 * 24 * time.Hour
+	sessionRepo := sessions.NewRepository(pool)
+	sessionService := sessions.NewService(sessionRepo, userRepo, sessionTTL)
+	sessionHandler := sessions.NewHandler(sessionService, sessionTTL)
+
 	mux := http.NewServeMux()
 
 	userHandler.RegisterRoutes(mux)
+	sessionHandler.RegisterRoutes(mux)
 
 	// Origin the browser frontend is served from. Required: rather than guess a
 	// default (which could silently allow the wrong origin in production), crash

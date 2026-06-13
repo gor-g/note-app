@@ -19,10 +19,14 @@ import "net/http"
 func CORSMiddleware(allowedOrigin string, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", allowedOrigin)
+		// Required for the browser to send/receive the session cookie on
+		// cross-origin requests. Note: with credentials the origin must be an
+		// explicit value (never "*"), which is why allowedOrigin is configured.
+		w.Header().Set("Access-Control-Allow-Credentials", "true")
 		// Tell caches the response varies by Origin (important once more than
 		// one origin is allowed).
 		w.Header().Set("Vary", "Origin")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 
 		// Preflight request: answer it directly with 204 and don't run the

@@ -27,15 +27,25 @@ note-app/
 
 This is an early-stage project. What exists today:
 
-- **Backend:** a single `POST /users` endpoint that creates a user (email +
-  bcrypt-hashed password) in Postgres. There is **no login/session endpoint
-  yet** and no authentication tokens.
-- **Frontend:** the login / sign-up screen (this step). Sign-up is wired to the
-  real `POST /users` endpoint; login is wired to a future `POST /sessions`
-  endpoint that the backend does not implement yet.
+- **Backend:** user signup (`POST /users`) plus session auth — `POST /sessions`
+  (login), `DELETE /sessions` (logout) and `GET /me` (current user). Sessions
+  use a server-side store with an opaque, hashed token delivered as an
+  `HttpOnly`, `Secure`, `SameSite=Lax` cookie.
+- **Frontend:** the login / sign-up screen, wired to the real endpoints. The
+  session is restored on page load via `GET /me`, so a refresh keeps you logged
+  in.
 
 The encryption, IndexedDB storage, card CRUD, and fuzzy search are **not built
 yet** — they are the planned next steps.
+
+### Session security model
+
+- The session token is 256 bits of CSPRNG randomness. The database stores only
+  its SHA-256 hash, so a DB leak cannot be replayed as a valid session.
+- The cookie is `HttpOnly` (JS can't read it → resistant to token theft via
+  XSS), `Secure` (HTTPS only), and `SameSite=Lax` (resistant to CSRF).
+- Login failures are deliberately vague and run in roughly constant time, so an
+  attacker can't tell whether an email is registered.
 
 ## Architecture intent (where this is heading)
 
@@ -89,7 +99,7 @@ The server listens on `:8081`.
 ## Roadmap
 
 1. ✅ User sign-up (backend) + login/sign-up UI (frontend).
-2. ⬜ Backend login + sessions (cookies or tokens).
+2. ✅ Backend login + sessions (HttpOnly cookie, server-side store).
 3. ⬜ Client-side crypto: key derivation, encrypt/decrypt cards.
 4. ⬜ IndexedDB storage layer for cards.
 5. ⬜ Card CRUD UI (create/review question–answer pairs).

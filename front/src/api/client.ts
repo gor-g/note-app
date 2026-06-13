@@ -32,6 +32,10 @@ export async function request<T>(
   const res = await fetch(`${API_URL}${path}`, {
     method: options.method ?? 'GET',
     headers: { 'Content-Type': 'application/json' },
+    // Send and receive the session cookie even though the API is on a different
+    // origin. Without this, the browser would neither store the Set-Cookie from
+    // login nor attach the cookie to later requests.
+    credentials: 'include',
     // Only serialise a body when one was provided.
     body: options.body !== undefined ? JSON.stringify(options.body) : undefined,
   })

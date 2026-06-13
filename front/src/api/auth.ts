@@ -1,7 +1,7 @@
 // Auth-specific API calls. These map 1:1 onto backend routes and define the
 // data shapes that cross the wire, so the rest of the UI stays typed.
 
-import { request } from './client'
+import { ApiError, request } from './client'
 
 // What the user types into the form.
 export interface Credentials {
@@ -22,10 +22,28 @@ export function signup(creds: Credentials): Promise<User> {
   return request<User>('/users', { method: 'POST', body: creds })
 }
 
-// Log in. NOTE: the backend does NOT implement this yet — there is currently
-// no `POST /sessions` route and no session/token mechanism at all. This call
-// is wired up so the UI is ready, and will start working once we add the
-// endpoint. Until then, attempting to log in will surface a clear error.
+// Log in. On success the server sets an HttpOnly session cookie (handled by the
+// browser automatically) and returns the user.
 export function login(creds: Credentials): Promise<User> {
   return request<User>('/sessions', { method: 'POST', body: creds })
+}
+
+// Log out: deletes the session server-side and clears the cookie.
+export function logout(): Promise<void> {
+  return request<void>('/sessions', { method: 'DELETE' })
+}
+
+// Ask the server who the current session belongs to. Used on page load to
+// restore a session from the cookie. Returns null when not logged in (the
+// server answers 401) rather than throwing, so callers can treat "logged out"
+// as a normal state.
+export async function getCurrentUser(): Promise<User | null> {
+  try {
+    return await request<User>('/me')
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 401) {
+      return null
+    }
+    throw err
+  }
 }
