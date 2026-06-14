@@ -4,7 +4,7 @@
 // move on — the Previous / Next buttons handle that — and a calendar button can
 // pin the next revision date by hand instead.
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Card } from "../cards/card";
 import { dueCards } from "../review/due";
 import { updateCardAfterReview, type Recall } from "../review/schedule";
@@ -35,8 +35,22 @@ export function ReviewPage({
   const [revealed, setRevealed] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Which answer is currently chosen for this card, so its button can show as
+  // active. Cleared when moving to another card.
+  const [selected, setSelected] = useState<Recall | null>(null);
 
   const currentCard = queue[index];
+
+  console.log(cards);
+
+  // The streak each card had when the session began. Grading always recomputes
+  // from this base rather than the card's latest value, so toggling a card from
+  // "not remember" back to "remember" restores its old streak (+1) instead of
+  // building up from the reset 0, and re-tapping the same answer never stacks.
+  const baseStreaks = useRef<Map<string, number> | null>(null);
+  if (baseStreaks.current === null) {
+    baseStreaks.current = new Map(queue.map((c) => [c.id, c.streak ?? 0]));
+  }
 
   // The streak is no longer shown on the card; log it for debugging instead.
   useEffect(() => {
@@ -45,6 +59,7 @@ export function ReviewPage({
 
   function goToCard(nextIndex: number) {
     setRevealed(false);
+    setSelected(null);
     setIndex(nextIndex);
   }
 
@@ -63,11 +78,18 @@ export function ReviewPage({
   }
 
   // Each tap reveals the answer and records the result, bumping the streak on
-  // "remember" or resetting it on "forgot". Re-tapping re-grades from the card's
-  // original streak (the queue holds the session snapshot), so it never stacks.
+  // "remember" or resetting it on "forgot". Both grade from the card's
+  // session-start streak (see baseStreaks), so a "remember" always restores the
+  // base + 1, even after a "not remember" reset it to 0.
   function handleRecall(recall: Recall) {
     setRevealed(true);
-    const updated = updateCardAfterReview(currentCard, recall);
+    setSelected(recall);
+    const base =
+      baseStreaks.current?.get(currentCard.id) ?? currentCard.streak ?? 0;
+    const updated = updateCardAfterReview(
+      { ...currentCard, streak: base },
+      recall,
+    );
     console.log("Card streak:", updated.streak);
     commit(updated);
   }
@@ -145,6 +167,9 @@ export function ReviewPage({
         <div className="review-grades">
           <button
             type="button"
+            className={
+              "review-remember" + (selected === "remember" ? " is-selected" : "")
+            }
             onClick={() => handleRecall("remember")}
             disabled={saving}
           >
@@ -152,6 +177,9 @@ export function ReviewPage({
           </button>
           <button
             type="button"
+            className={
+              "review-forgot" + (selected === "forgot" ? " is-selected" : "")
+            }
             onClick={() => handleRecall("forgot")}
             disabled={saving}
           >

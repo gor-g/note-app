@@ -86,7 +86,7 @@
 }
 
 /* Primary submit button for the auth form. */
-.auth-form button[type='submit'] {
+.auth-form button[type="submit"] {
   padding: 11px;
   border: none;
   border-radius: 8px;
@@ -97,7 +97,7 @@
   cursor: pointer;
 }
 
-.auth-form button[type='submit']:disabled {
+.auth-form button[type="submit"]:disabled {
   opacity: 0.6;
   cursor: progress;
 }
@@ -247,7 +247,7 @@
   box-shadow: 0 0 0 3px var(--accent-bg);
 }
 
-.card-form button[type='submit'] {
+.card-form button[type="submit"] {
   align-self: flex-start;
   padding: 11px 18px;
   border: none;
@@ -259,7 +259,7 @@
   cursor: pointer;
 }
 
-.card-form button[type='submit']:disabled {
+.card-form button[type="submit"]:disabled {
   opacity: 0.6;
   cursor: progress;
 }
@@ -292,7 +292,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding: 14px;
+  padding: 7px;
   border-right: 1px solid var(--border);
 }
 
@@ -564,6 +564,15 @@
 .review-grades button:disabled {
   opacity: 0.6;
   cursor: progress;
+}
+
+/* The chosen answer is highlighted: green for Remember, red for Not remember. */
+.review-remember.is-selected {
+  background: #30a46c;
+}
+
+.review-forgot.is-selected {
+  background: #e5484d;
 }
 
 /* Previous / Next, beneath the recall buttons — secondary (outlined) styling. */
