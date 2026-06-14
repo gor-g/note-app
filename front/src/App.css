@@ -85,9 +85,8 @@
   box-shadow: 0 0 0 3px var(--accent-bg);
 }
 
-/* Primary submit button, reused on the placeholder home screen too. */
-.auth-form button[type='submit'],
-.auth-card > button {
+/* Primary submit button for the auth form. */
+.auth-form button[type='submit'] {
   padding: 11px;
   border: none;
   border-radius: 8px;
@@ -103,13 +102,560 @@
   cursor: progress;
 }
 
-.auth-card > button {
-  margin-top: 20px;
-}
-
 /* Inline error message shown under the form on failure. */
 .auth-error {
   color: #e5484d;
   font-size: 14px;
   margin: 0;
+}
+
+/* --- Home (logged-in) screen --- */
+
+/* Fills the root column and lays out a header above the scrolling content.
+   `flex: 1` makes it take the full height regardless of the root's vertical
+   centring (which is what the auth screen relies on). */
+.home {
+  width: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.home-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.home-title {
+  margin: 0;
+}
+
+.home-account {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.home-email {
+  font-size: 14px;
+  color: var(--text);
+}
+
+.home-logout {
+  padding: 8px 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text-h);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* Header button that opens the card editor for a brand-new card. */
+.home-new {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #fff;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.home-main {
+  padding: 24px;
+}
+
+.home-empty {
+  color: var(--text);
+}
+
+/* Card form, shown on the editor screen for both adding and editing a card.
+   It fills the editor area so the fields can grow to take all the free space. */
+.card-form {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* The question/answer fields stack and nearly touch; `position: relative`
+   anchors the swap button that floats over the seam between them. */
+.card-fields {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Wraps each textarea so the full-screen toggle can sit in its corner. */
+.card-field {
+  position: relative;
+  flex: 1;
+  display: flex;
+}
+
+/* Full-screen editing: the field covers the viewport until toggled back. */
+.card-field-full {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  flex: none;
+  padding: 24px;
+  background: var(--bg);
+}
+
+/* Corner button (four corners icon) that expands a field to full screen. */
+.card-fullscreen {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 2;
+  display: inline-flex;
+  padding: 5px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text-h);
+  cursor: pointer;
+}
+
+.card-form textarea {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text-h);
+  font: inherit;
+  resize: none;
+}
+
+.card-form textarea:focus {
+  outline: none;
+  border-color: var(--accent-border);
+  box-shadow: 0 0 0 3px var(--accent-bg);
+}
+
+.card-form button[type='submit'] {
+  align-self: flex-start;
+  padding: 11px 18px;
+  border: none;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #fff;
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.card-form button[type='submit']:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+/* Swaps the question and answer text. Floats over the seam between the two
+   fields, centred and overlapping both. */
+.card-swap {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  display: inline-flex;
+  padding: 6px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text-h);
+  box-shadow: var(--shadow);
+  cursor: pointer;
+}
+
+.card-swap:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+/* Left column: the Edit / Delete actions, stacked vertically. */
+.card-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px;
+  border-right: 1px solid var(--border);
+}
+
+/* Square icon buttons holding the pencil / trash glyphs. */
+.card-edit,
+.card-delete {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  cursor: pointer;
+}
+
+.card-edit {
+  color: var(--text-h);
+}
+
+/* Delete is the destructive action, tinted with the same red as form errors. */
+.card-delete {
+  color: #e5484d;
+}
+
+/* While a delete is in flight both buttons are disabled. */
+.card-edit:disabled,
+.card-delete:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+/* Inline failure message under a card (e.g. a delete that didn't go through). */
+.card-error {
+  padding: 0 16px 14px;
+  color: #e5484d;
+  font-size: 14px;
+}
+
+/* Search box above the card list. */
+.card-search {
+  width: 100%;
+  max-width: 640px;
+  margin-bottom: 16px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text-h);
+  font: inherit;
+}
+
+.card-search:focus {
+  outline: none;
+  border-color: var(--accent-border);
+  box-shadow: 0 0 0 3px var(--accent-bg);
+}
+
+/* The card list and its items. */
+.card-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 640px;
+}
+
+.card-item {
+  display: flex;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+  overflow: hidden;
+}
+
+/* An explicit `display` overrides the UA `[hidden] { display: none }`, so
+   restore it — otherwise search-filtered cards stay visible. */
+.card-item[hidden] {
+  display: none;
+}
+
+/* Right column: question / answer / error. min-width:0 lets long text wrap
+   instead of forcing the flex row wider. */
+.card-body {
+  flex: 1;
+  min-width: 0;
+}
+
+/* The full-width clickable question header. */
+.card-question {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 14px 16px;
+  border: none;
+  background: transparent;
+  color: var(--text-h);
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: pre-wrap;
+}
+
+/* The revealed answer. Hidden via the `hidden` attribute (display: none) when
+   collapsed, so the node stays mounted across toggles. */
+.card-answer {
+  padding: 0 16px 14px;
+  color: var(--text);
+  white-space: pre-wrap;
+}
+
+/* --- Card editor screen (add / edit) --- */
+
+/* Mirrors the home screen: a header above the scrolling form area. */
+.editor {
+  width: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.editor-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.editor-back {
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text-h);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.editor-title {
+  margin: 0;
+}
+
+.editor-main {
+  flex: 1;
+  display: flex;
+  padding: 24px;
+}
+
+/* --- Review screen --- */
+
+/* Button on the home screen that starts a review session. */
+.review-start {
+  align-self: flex-start;
+  margin-bottom: 24px;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #fff;
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.review {
+  width: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  padding: 24px;
+  text-align: center;
+}
+
+.review-bar {
+  width: 100%;
+  max-width: 640px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+/* Edit / New, grouped at the right end of the bar. */
+.review-bar-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.review-progress {
+  color: var(--text);
+  font-size: 14px;
+}
+
+.review-exit {
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text-h);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* Grows to fill the height between the bar and the controls, and lays out the
+   question and answer as a column. */
+.review-card {
+  width: 100%;
+  max-width: 640px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 32px 24px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+}
+
+.review-question {
+  font-size: 20px;
+  color: var(--text-h);
+  white-space: pre-wrap;
+}
+
+/* Always present (the divider reserves the lower half of the card); the text
+   inside is what gets hidden until the card is revealed. */
+.review-answer {
+  flex: 1;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+
+.review-answer-text {
+  color: var(--text);
+  white-space: pre-wrap;
+}
+
+.review-controls {
+  width: 100%;
+  max-width: 640px;
+}
+
+/* The Remember / Not remember buttons split the full width evenly. */
+.review-grades {
+  display: flex;
+  gap: 8px;
+}
+
+.review-grades button {
+  flex: 1;
+  padding: 11px 22px;
+  border: none;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #fff;
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.review-grades button:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+/* Previous / Next, beneath the recall buttons — secondary (outlined) styling. */
+.review-nav {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.review-nav button {
+  flex: 1;
+  padding: 9px 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text-h);
+  font: inherit;
+  cursor: pointer;
+}
+
+.review-nav button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Calendar button + its date popover (review bar and editor header). */
+.date-picker {
+  position: relative;
+  display: inline-flex;
+}
+
+.date-picker-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text-h);
+  cursor: pointer;
+}
+
+/* Popover anchored under the button: a vertical list of interval choices. */
+.date-picker-popover {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 60vh;
+  overflow-y: auto;
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+  box-shadow: var(--shadow);
+  z-index: 10;
+}
+
+/* An explicit `display` overrides the UA `[hidden] { display: none }`, so
+   restore it — otherwise the popover would always show. */
+.date-picker-popover[hidden] {
+  display: none;
+}
+
+.date-picker-label {
+  padding: 4px 8px;
+  color: var(--text);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.date-picker-popover button {
+  padding: 7px 12px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-h);
+  font: inherit;
+  font-size: 14px;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.date-picker-popover button:hover {
+  background: var(--accent-bg);
+}
+
+/* Push the calendar button to the right edge of the editor header. */
+.editor-header .date-picker {
+  margin-left: auto;
 }
