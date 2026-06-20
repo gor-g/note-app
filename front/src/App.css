@@ -818,8 +818,164 @@
   background: var(--accent-bg);
 }
 
-/* Group both header pickers at the right edge; the first one takes up the
-   slack, the calendar button then sits beside it via the header's gap. */
-.editor-header .priority-picker {
+/* Group the header pickers at the right edge; the first one takes up the slack,
+   the others then sit beside it via the header's gap. */
+.editor-header .tag-picker {
   margin-left: auto;
+}
+
+/* Tag picker: a tag-icon trigger (mirroring the priority button) plus a centred
+   modal popup for choosing and creating tags. */
+.tag-picker {
+  position: relative;
+  display: inline-flex;
+}
+
+.tag-picker-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text-h);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* Count of selected tags, shown beside the icon when non-zero. */
+.tag-picker-count {
+  min-width: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: var(--accent-bg);
+  color: var(--text-h);
+  font-size: 12px;
+  line-height: 18px;
+  text-align: center;
+}
+
+/* Transparent backdrop; catches outside clicks to close. Below the popup. */
+.tag-picker-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: transparent;
+}
+
+/* The popup itself: a centred modal floating over the overlay. The choices are
+   always a vertical column (unlike the priority popup's responsive row). */
+.tag-picker-popover {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 101;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: min(300px, 92vw);
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg);
+  box-shadow: var(--shadow);
+}
+
+/* An explicit `display` overrides the UA `[hidden] { display: none }`, so
+   restore it — otherwise the popup would always show. */
+.tag-picker-popover[hidden] {
+  display: none;
+}
+
+/* Search line: the input grows, the + create button sits at its end. */
+.tag-picker-search {
+  display: flex;
+  gap: 6px;
+}
+
+.tag-picker-search input {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text-h);
+  font: inherit;
+  font-size: 14px;
+}
+
+.tag-picker-search input:focus {
+  outline: none;
+  border-color: var(--accent-border);
+  box-shadow: 0 0 0 3px var(--accent-bg);
+}
+
+.tag-picker-add {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text-h);
+  font: inherit;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.tag-picker-add:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Vertical, scrollable list of tag checkboxes. */
+.tag-picker-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
+.tag-picker-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-h);
+  font: inherit;
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.tag-picker-item:hover {
+  background: var(--accent-bg);
+}
+
+/* Selected tag: outlined like the priority popup's active number. */
+.tag-picker-item.is-selected {
+  border-color: var(--accent-border);
+  background: var(--accent-bg);
+}
+
+/* Fixed-width box for the checkmark so labels line up whether ticked or not. */
+.tag-picker-check {
+  width: 14px;
+  color: var(--accent-border);
+}
+
+.tag-picker-empty {
+  padding: 8px 10px;
+  color: var(--text);
+  font-size: 13px;
 }

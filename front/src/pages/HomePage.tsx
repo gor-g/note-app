@@ -49,6 +49,22 @@ export function HomePage({ user, onLogout }: HomePageProps) {
     [cards],
   );
 
+  // Every distinct tag in use, offered as choices in the editor. De-duplicated
+  // case-insensitively, keeping the first spelling seen.
+  const allTags = useMemo(() => {
+    const seen = new Set<string>();
+    const tags: string[] = [];
+    for (const card of cards) {
+      for (const tag of card.tags ?? []) {
+        const key = tag.toLowerCase();
+        if (seen.has(key)) continue;
+        seen.add(key);
+        tags.push(tag);
+      }
+    }
+    return tags;
+  }, [cards]);
+
   useEffect(() => {
     loadCardsNewestFirst()
       .then(setCards)
@@ -64,8 +80,9 @@ export function HomePage({ user, onLogout }: HomePageProps) {
     nextReviewAt: string | null,
     streak: number,
     priority: number,
+    tags: string[],
   ) {
-    const card = await createCard(values, nextReviewAt, streak, priority);
+    const card = await createCard(values, nextReviewAt, streak, priority, tags);
     setCards((prev) => [card, ...prev]);
   }
 
@@ -97,8 +114,9 @@ export function HomePage({ user, onLogout }: HomePageProps) {
     return (
       <CardEditorPage
         card={target}
+        allTags={allTags}
         onCancel={() => setView({ kind: from })}
-        onSubmit={async (values, nextReviewAt, streak, priority) => {
+        onSubmit={async (values, nextReviewAt, streak, priority, tags) => {
           if (target)
             await handleUpdate({
               ...target,
@@ -106,8 +124,10 @@ export function HomePage({ user, onLogout }: HomePageProps) {
               nextReviewAt,
               streak,
               priority,
+              tags,
             });
-          else await handleCreate(values, nextReviewAt, streak, priority);
+          else
+            await handleCreate(values, nextReviewAt, streak, priority, tags);
           setView({ kind: from });
         }}
       />

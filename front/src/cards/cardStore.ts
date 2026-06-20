@@ -44,12 +44,14 @@ export async function createCard(
   nextReviewAt: string | null = null,
   streak = 0,
   priority = 5,
+  tags: string[] = [],
 ): Promise<Card> {
   const card: Card = {
     id: crypto.randomUUID(),
     question: input.question,
     answer: input.answer,
     priority,
+    tags,
     createdAt: new Date().toISOString(),
     // A new card has never been shown. It's due immediately by default
     // (nextReviewAt null = "due now") unless the editor pinned a date/streak.

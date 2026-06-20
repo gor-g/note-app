@@ -12,6 +12,11 @@ export interface Card {
   // with `?? 5`.
   priority: number;
 
+  // Free-form tag names on the card, compared case-insensitively (so each name
+  // is unique regardless of case). Cards predating this field may lack it, so
+  // read defensively with `?? []`.
+  tags: string[];
+
   // ISO-8601 string rather than a Date, so it matches the wire format and sorts
   // chronologically without timezone surprises.
   createdAt: string;
