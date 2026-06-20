@@ -1,23 +1,46 @@
 # Memonote
 
 A web app for taking **memo notes as question–answer pairs** — small flashcard-like
-cards you can review and search. The defining constraints of the project:
+cards you can review and search. You **create question/answer pairs**, review the
+ones that are due, and **filter them by tag and by priority** (plus client-side
+fuzzy search). The defining constraints of the project:
 
 - **End-to-end encryption (E2EE).** Note contents are encrypted in the browser
   before anything leaves the device. The server only ever stores ciphertext and
   never has access to the keys, so it cannot read your notes.
-- **Local-first data.** Cards live in the browser's **IndexedDB**, so the app
-  works against a local copy of the data.
 - **Client-side fuzzy search.** Search runs entirely in the front end over the
-  decrypted data in IndexedDB — the server is never asked to search (it couldn't
-  anyway, since it only holds ciphertext).
+  decrypted cards — the server is never asked to search (it couldn't anyway,
+  since it only holds ciphertext).
+
+Cards are stored on the server as opaque, client-encrypted blobs; the front end
+reads and writes them directly over the network, decrypting in memory to display
+and search. A **local-first IndexedDB cache** (to work offline against a local
+copy of the data) was planned, but it's been **dropped for the moment** — the
+sync and conflict handling it required added too much complexity for where the
+project is now. It may return later.
+
+## Screenshots
+
+**Home** — your cards, with "review due cards", tag and priority filters, and
+fuzzy search:
+
+![Home screen](doc/images/home-screen.png)
+
+**New card** — create a question/answer pair, with tag, priority and due-date
+controls:
+
+![New card screen](doc/images/new-card-screen.png)
+
+**Review** — flip through due cards and mark each remembered or not:
+
+![Question / answer review screen](doc/images/question-answerscreen.png)
 
 ## Repository layout
 
 ```
 note-app/
 ├── front/      React + TypeScript + Vite single-page app (the UI)
-├── back/       Go HTTP API (users, and later: cards/sync)
+├── back/       Go HTTP API (users, sessions, card sync)
 ├── cicd/       Build/run scripts and local Postgres + migration tooling
 ├── secrets/    Local-only credential env files (git-ignored)
 └── external/   Vendored binaries (e.g. dbmate) (git-ignored)
@@ -30,13 +53,17 @@ This is an early-stage project. What exists today:
 - **Backend:** user signup (`POST /users`) plus session auth — `POST /sessions`
   (login), `DELETE /sessions` (logout) and `GET /me` (current user). Sessions
   use a server-side store with an opaque, hashed token delivered as an
-  `HttpOnly`, `Secure`, `SameSite=Lax` cookie.
-- **Frontend:** the login / sign-up screen, wired to the real endpoints. The
-  session is restored on page load via `GET /me`, so a refresh keeps you logged
-  in.
+  `HttpOnly`, `Secure`, `SameSite=Lax` cookie. Card sync endpoints store opaque
+  encrypted blobs: `GET /cards` (optionally `?since=` for incremental sync),
+  `PUT /cards` (batch upsert) and `DELETE /cards/{id}` (tombstone).
+- **Frontend:** the login / sign-up screen wired to the real endpoints, the
+  client-side encryption (key derivation + AES-GCM), and card CRUD with review
+  scheduling and client-side fuzzy search. The session is restored on page load
+  via `GET /me`, so a refresh keeps you logged in (the in-memory encryption key
+  is also restored from this tab's `sessionStorage`).
 
-The encryption, IndexedDB storage, card CRUD, and fuzzy search are **not built
-yet** — they are the planned next steps.
+The **local-first IndexedDB cache** is the main piece deliberately left out for
+now (see above) — every card read/write currently hits the server.
 
 ### Session security model
 
@@ -53,8 +80,8 @@ Because of the E2EE requirement, the backend is deliberately "dumb" about note
 contents. The likely split:
 
 - **Frontend** derives an encryption key from the user's password (see
-  _Encryption & key derivation_ below), encrypts/decrypts cards locally, stores
-  them in IndexedDB, and does all searching there.
+  _Encryption & key derivation_ below), encrypts/decrypts cards in the browser,
+  and does all searching there.
 - **Backend** authenticates users and stores **opaque encrypted blobs** for
   cross-device sync — never plaintext, never keys.
 
