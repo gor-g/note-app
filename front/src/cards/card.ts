@@ -7,6 +7,11 @@ export interface Card {
   question: string;
   answer: string;
 
+  // User-set review priority from 0 (lowest) to 10 (highest); defaults to 5.
+  // Cards created before this field existed may lack it, so read defensively
+  // with `?? 5`.
+  priority: number;
+
   // ISO-8601 string rather than a Date, so it matches the wire format and sorts
   // chronologically without timezone surprises.
   createdAt: string;

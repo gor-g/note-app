@@ -4,7 +4,7 @@
   --bg: #fff;
   --border: #e5e4e7;
   --code-bg: #f4f3ec;
-  --accent: #27c764;
+  --accent: #6faa86;
   --accent-bg: rgba(53, 253, 130, 0.1);
   --accent-border: rgba(53, 252, 129, 0.5);
   --shadow:
@@ -36,7 +36,7 @@
     --bg: #16171d;
     --border: #2e303a;
     --code-bg: #1f2028;
-    --accent: rgb(111, 170, 134);
+    --accent: #6faa86;
     --accent-bg: rgba(155, 255, 193, 0.15);
     --accent-border: rgba(89, 139, 109, 0.5);
     --shadow:

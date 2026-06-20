@@ -8,6 +8,7 @@ import { useState } from "react";
 import type { Card, NewCard } from "../cards/card";
 import { CardForm } from "../components/CardForm";
 import { RevisionDateButton } from "../components/RevisionDateButton";
+import { PriorityButton } from "../components/PriorityButton";
 
 interface CardEditorPageProps {
   // The card being edited, or null when adding a new one.
@@ -16,6 +17,7 @@ interface CardEditorPageProps {
     values: NewCard,
     nextReviewAt: string | null,
     streak: number,
+    priority: number,
   ) => Promise<void>;
   onCancel: () => void;
 }
@@ -28,6 +30,9 @@ export function CardEditorPage({ card, onSubmit, onCancel }: CardEditorPageProps
     card?.nextReviewAt ?? null,
   );
   const [streak, setStreak] = useState(card?.streak ?? 0);
+  // 5 is the default priority for a card with none set (new card or an older
+  // card saved before the field existed).
+  const [priority, setPriority] = useState(card?.priority ?? 5);
 
   function handlePickDate(iso: string, level: number) {
     setNextReviewAt(iso);
@@ -41,6 +46,7 @@ export function CardEditorPage({ card, onSubmit, onCancel }: CardEditorPageProps
           ← Back
         </button>
         <h2 className="editor-title">{editing ? "Edit card" : "New card"}</h2>
+        <PriorityButton value={priority} onChange={setPriority} />
         <RevisionDateButton onChange={handlePickDate} />
       </header>
 
@@ -50,7 +56,7 @@ export function CardEditorPage({ card, onSubmit, onCancel }: CardEditorPageProps
             card ? { question: card.question, answer: card.answer } : undefined
           }
           submitLabel={editing ? "Save" : "Add card"}
-          onSubmit={(values) => onSubmit(values, nextReviewAt, streak)}
+          onSubmit={(values) => onSubmit(values, nextReviewAt, streak, priority)}
         />
       </main>
     </div>

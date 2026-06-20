@@ -234,7 +234,7 @@
   padding: 5px;
   border: 1px solid var(--border);
   border-radius: 8px;
-  background: var(--bg);
+  background: #00000000;
   color: var(--text-h);
   cursor: pointer;
 }
@@ -562,7 +562,7 @@
   padding: 5px;
   border: 1px solid var(--border);
   border-radius: 8px;
-  background: var(--bg);
+  background: #00000000;
   color: var(--text-h);
   cursor: pointer;
 }
@@ -717,7 +717,109 @@
   background: var(--accent-bg);
 }
 
-/* Push the calendar button to the right edge of the editor header. */
-.editor-header .date-picker {
+/* Priority picker: same popover pattern as the date picker, but its button
+   carries the current value and the choices lay out as a compact number grid. */
+.priority-picker {
+  position: relative;
+  display: inline-flex;
+}
+
+.priority-picker-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text-h);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.priority-picker-value {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Transparent full-screen backdrop behind the popover; catches outside clicks
+   to close the menu. Sits above the page but below the popover itself. */
+.priority-picker-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: #00000099;
+}
+
+/* A popup floating in the centre of the viewport over the overlay (not anchored
+   to the button). The 0–10 choices run in a horizontal row on full screen and
+   switch to a vertical column on mobile (see below). */
+.priority-picker-popover {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 101;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg);
+  box-shadow: var(--shadow);
+}
+
+/* An explicit `display` overrides the UA `[hidden] { display: none }`, so
+   restore it — otherwise the popover would always show. */
+.priority-picker-popover[hidden] {
+  display: none;
+}
+
+.priority-picker-label {
+  padding: 4px 8px;
+  color: var(--text);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+/* On mobile the row would overflow, so stack the choices vertically. */
+@media (max-width: 600px) {
+  .priority-picker-popover {
+    flex-direction: column;
+    align-items: stretch;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+}
+
+.priority-picker-popover button {
+  min-width: 38px;
+  padding: 8px 0;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-h);
+  font: inherit;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  cursor: pointer;
+}
+
+.priority-picker-popover button:hover {
+  background: var(--accent-bg);
+}
+
+/* The currently selected priority, outlined so it reads as "active". */
+.priority-picker-popover button.is-selected {
+  border-color: var(--accent-border);
+  background: var(--accent-bg);
+}
+
+/* Group both header pickers at the right edge; the first one takes up the
+   slack, the calendar button then sits beside it via the header's gap. */
+.editor-header .priority-picker {
   margin-left: auto;
 }

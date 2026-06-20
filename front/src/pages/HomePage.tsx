@@ -63,8 +63,9 @@ export function HomePage({ user, onLogout }: HomePageProps) {
     values: NewCard,
     nextReviewAt: string | null,
     streak: number,
+    priority: number,
   ) {
-    const card = await createCard(values, nextReviewAt, streak);
+    const card = await createCard(values, nextReviewAt, streak, priority);
     setCards((prev) => [card, ...prev]);
   }
 
@@ -97,10 +98,16 @@ export function HomePage({ user, onLogout }: HomePageProps) {
       <CardEditorPage
         card={target}
         onCancel={() => setView({ kind: from })}
-        onSubmit={async (values, nextReviewAt, streak) => {
+        onSubmit={async (values, nextReviewAt, streak, priority) => {
           if (target)
-            await handleUpdate({ ...target, ...values, nextReviewAt, streak });
-          else await handleCreate(values, nextReviewAt, streak);
+            await handleUpdate({
+              ...target,
+              ...values,
+              nextReviewAt,
+              streak,
+              priority,
+            });
+          else await handleCreate(values, nextReviewAt, streak, priority);
           setView({ kind: from });
         }}
       />
