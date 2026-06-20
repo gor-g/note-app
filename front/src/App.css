@@ -137,6 +137,7 @@
   justify-content: space-between;
   gap: 16px;
   padding: 16px 24px;
+  margin-bottom: 14px;
   border-bottom: 1px solid var(--border);
 }
 
@@ -516,6 +517,7 @@
 /* Grows to fill the height between the bar and the controls, and lays out the
    question and answer as a column. */
 .review-card {
+  position: relative;
   width: 100%;
   max-width: 640px;
   flex: 1;
@@ -527,6 +529,44 @@
   box-shadow: var(--shadow);
 }
 
+/* The question's wrapper: anchors its corner full-screen button. The answer's
+   wrapper is .review-answer, which gets position: relative below. */
+.review-half {
+  position: relative;
+}
+
+/* Full-screen review: one half of the card covers the viewport until toggled
+   back, mirroring the editor's per-field full-screen mode (.card-field-full).
+   The centring gives the question or answer a focused, distraction-free view.
+   Scoped under .review-card to outrank .review-answer's own position/border. */
+.review-card .review-half-full {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  margin: 0;
+  border: none;
+  padding: 24px;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Corner button (four corners icon) that expands a card half to full screen. */
+.review-fullscreen {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 2;
+  display: inline-flex;
+  padding: 5px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text-h);
+  cursor: pointer;
+}
+
 .review-question {
   font-size: 20px;
   color: var(--text-h);
@@ -534,8 +574,10 @@
 }
 
 /* Always present (the divider reserves the lower half of the card); the text
-   inside is what gets hidden until the card is revealed. */
+   inside is what gets hidden until the card is revealed. position: relative
+   anchors its corner full-screen button. */
 .review-answer {
+  position: relative;
   flex: 1;
   margin-top: 20px;
   padding-top: 20px;
