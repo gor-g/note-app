@@ -1,0 +1,1 @@
+docker start postgres_17_note_app && docker ps --filter "name=postgres_17_note_app" --format "table {{.Names}}\t{{.Status}}"
