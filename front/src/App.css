@@ -5,6 +5,15 @@
   padding: 24px;
 }
 
+/* On phones, give the editor screen more room: drop the root's side padding
+   (while the editor is showing) and the editor body's padding, so the fields
+   run full width. The side borders stay. */
+@media (max-width: 600px) {
+  #root {
+    padding-inline: 0;
+  }
+}
+
 /* The card that holds the auth form (and the placeholder home screen). */
 .auth-card {
   width: 100%;
@@ -171,7 +180,7 @@
 }
 
 .home-main {
-  padding: 24px;
+  padding: 4px;
 }
 
 .home-empty {
@@ -210,7 +219,7 @@
   inset: 0;
   z-index: 10;
   flex: none;
-  padding: 24px;
+  padding: 4px;
   background: var(--bg);
 }
 
@@ -443,7 +452,7 @@
 .editor-main {
   flex: 1;
   display: flex;
-  padding: 24px;
+  padding: 4px;
 }
 
 /* --- Review screen --- */
