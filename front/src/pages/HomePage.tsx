@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import type { User } from "../api/auth";
 import type { Card, NewCard } from "../cards/card";
 import {
+  cardMatchesFilter,
   cardMatchesQuery,
   createCard,
   deleteCard,
@@ -10,6 +11,8 @@ import {
 } from "../cards/cardStore";
 import { isDue } from "../review/due";
 import { CardItem } from "../components/CardItem";
+import { MinPriorityButton } from "../components/MinPriorityButton";
+import { TagFilterButton } from "../components/TagFilterButton";
 import { CardEditorPage } from "./CardEditorPage";
 import { ReviewPage } from "./ReviewPage";
 
@@ -32,21 +35,38 @@ export function HomePage({ user, onLogout }: HomePageProps) {
   const [error, setError] = useState<string | null>(null);
   const [query, setQuery] = useState("");
   const [view, setView] = useState<View>({ kind: "list" });
+  // Tag / min-priority filters. They apply to both the list and the review
+  // queue, so the cards you study match what the list shows.
+  const [filterTags, setFilterTags] = useState<string[]>([]);
+  const [minPriority, setMinPriority] = useState(0);
 
   const trimmedQuery = query.trim();
+
+  // The cards passing the tag/priority filters, shared by the list, the due
+  // count, and the review session.
+  const filteredCards = useMemo(
+    () =>
+      cards.filter((card) =>
+        cardMatchesFilter(card, { tags: filterTags, minPriority }),
+      ),
+    [cards, filterTags, minPriority],
+  );
+
   // Non-matching cards are kept mounted and hidden (rather than removed), so
-  // their expanded state survives a search.
+  // their expanded state survives a search. Visibility combines the text search
+  // with the active filters.
   const visibleCardIds = useMemo(() => {
     const ids = new Set<string>();
-    for (const card of cards) {
+    for (const card of filteredCards) {
       if (cardMatchesQuery(card, trimmedQuery)) ids.add(card.id);
     }
     return ids;
-  }, [cards, trimmedQuery]);
+  }, [filteredCards, trimmedQuery]);
 
   const dueCount = useMemo(
-    () => cards.reduce((count, card) => (isDue(card) ? count + 1 : count), 0),
-    [cards],
+    () =>
+      filteredCards.reduce((count, card) => (isDue(card) ? count + 1 : count), 0),
+    [filteredCards],
   );
 
   // Every distinct tag in use, offered as choices in the editor. De-duplicated
@@ -99,7 +119,7 @@ export function HomePage({ user, onLogout }: HomePageProps) {
   if (view.kind === "review") {
     return (
       <ReviewPage
-        cards={cards}
+        cards={filteredCards}
         onGrade={handleUpdate}
         onExit={() => setView({ kind: "list" })}
         onEditCard={(card) => setView({ kind: "editor", card, from: "review" })}
@@ -162,14 +182,27 @@ export function HomePage({ user, onLogout }: HomePageProps) {
           <p className="auth-error">{error}</p>
         ) : (
           <>
-            {dueCount > 0 && (
-              <button
-                type="button"
-                className="review-start"
-                onClick={() => setView({ kind: "review" })}
-              >
-                Review {dueCount} due {dueCount === 1 ? "card" : "cards"}
-              </button>
+            {cards.length > 0 && (
+              <div className="home-controls">
+                {dueCount > 0 && (
+                  <button
+                    type="button"
+                    className="review-start"
+                    onClick={() => setView({ kind: "review" })}
+                  >
+                    Review {dueCount} due {dueCount === 1 ? "card" : "cards"}
+                  </button>
+                )}
+                <TagFilterButton
+                  allTags={allTags}
+                  selected={filterTags}
+                  onChange={setFilterTags}
+                />
+                <MinPriorityButton
+                  value={minPriority}
+                  onChange={setMinPriority}
+                />
+              </div>
             )}
 
             {cards.length === 0 ? (

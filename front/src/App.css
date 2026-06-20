@@ -459,9 +459,16 @@
 /* --- Review screen --- */
 
 /* Button on the home screen that starts a review session. */
-.review-start {
-  align-self: flex-start;
+/* Row holding the Review button and the tag / min-priority filters. */
+.home-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
   margin-bottom: 24px;
+}
+
+.review-start {
   padding: 10px 16px;
   border: none;
   border-radius: 8px;
@@ -470,6 +477,36 @@
   font: inherit;
   font-weight: 500;
   cursor: pointer;
+}
+
+/* A filter with a value set is highlighted so its active state is obvious. */
+.tag-picker-button.is-active,
+.priority-picker-button.is-active {
+  border-color: var(--accent-border);
+  background: var(--accent-bg);
+}
+
+/* Header row inside the tag-filter popup: the label and a Clear shortcut. */
+.tag-filter-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.tag-filter-clear {
+  padding: 2px 6px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-h);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.tag-filter-clear:hover {
+  text-decoration: underline;
 }
 
 .review {

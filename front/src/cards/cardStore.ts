@@ -72,6 +72,24 @@ export function cardMatchesQuery(card: Card, query: string): boolean {
   return fuzzyMatch(query, card.question) || fuzzyMatch(query, card.answer);
 }
 
+// Tag and priority filters applied to the card list and the review queue alike.
+export interface CardFilter {
+  // Tags to require, matched case-insensitively. A card passes if it carries any
+  // of these (OR); empty means no tag filter.
+  tags: string[];
+  // The card's priority must be at least this; 0 lets everything through.
+  minPriority: number;
+}
+
+export function cardMatchesFilter(card: Card, filter: CardFilter): boolean {
+  if ((card.priority ?? 5) < filter.minPriority) return false;
+  if (filter.tags.length > 0) {
+    const cardTags = new Set((card.tags ?? []).map((t) => t.toLowerCase()));
+    if (!filter.tags.some((t) => cardTags.has(t.toLowerCase()))) return false;
+  }
+  return true;
+}
+
 // The server returns cards in `id` order (random UUIDs), so newest-first has to
 // be imposed here.
 export async function loadCardsNewestFirst(): Promise<Card[]> {
