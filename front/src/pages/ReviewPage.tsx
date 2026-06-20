@@ -6,7 +6,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { Card } from "../cards/card";
-import { dueCards } from "../review/due";
+import { dueCards, sortByReviewOrder } from "../review/due";
 import { updateCardAfterReview, type Recall } from "../review/schedule";
 import { RevisionDateButton } from "../components/RevisionDateButton";
 
@@ -30,7 +30,7 @@ export function ReviewPage({
   // Snapshot the due cards once, when the session starts, so the queue doesn't
   // shift under the user as cards get rescheduled. Navigation through it is
   // manual (Previous / Next).
-  const [queue] = useState(() => dueCards(cards));
+  const [queue] = useState(() => sortByReviewOrder(dueCards(cards)));
   const [index, setIndex] = useState(0);
   const [revealed, setRevealed] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -40,7 +40,9 @@ export function ReviewPage({
   const [selected, setSelected] = useState<Recall | null>(null);
   // Which half of the card, if any, is expanded to fill the viewport for
   // distraction-free review, mirroring the editor's per-field full-screen toggle.
-  const [fullField, setFullField] = useState<"question" | "answer" | null>(null);
+  const [fullField, setFullField] = useState<"question" | "answer" | null>(
+    null,
+  );
 
   const currentCard = queue[index];
 
@@ -202,7 +204,8 @@ export function ReviewPage({
       <div className="review-card">
         <div
           className={
-            "review-half" + (fullField === "question" ? " review-half-full" : "")
+            "review-half" +
+            (fullField === "question" ? " review-half-full" : "")
           }
         >
           {renderExpandButton("question")}
@@ -212,7 +215,8 @@ export function ReviewPage({
             space); only the text inside is hidden until the card is revealed. */}
         <div
           className={
-            "review-answer" + (fullField === "answer" ? " review-half-full" : "")
+            "review-answer" +
+            (fullField === "answer" ? " review-half-full" : "")
           }
         >
           {renderExpandButton("answer")}
@@ -227,7 +231,8 @@ export function ReviewPage({
           <button
             type="button"
             className={
-              "review-remember" + (selected === "remember" ? " is-selected" : "")
+              "review-remember" +
+              (selected === "remember" ? " is-selected" : "")
             }
             onClick={() => handleRecall("remember")}
             disabled={saving}
